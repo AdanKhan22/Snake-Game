@@ -1,16 +1,22 @@
 # Snake Game using Raylib in C++
 
-- **Features**
-  - Classic Snake gameplay with basic mechanics.
-  - Graphical interface using Raylib for rendering.
+This project implements the classic Snake game using the Raylib library in C++.
 
-```bash
-git clone https://github.com/yourusername/snake-game.git
-cd snake-game
+## Features
 
-Install Raylib library from [Raylib GitHub](https://github.com/raysan5/raylib) or using your package manager.
+- Classic Snake gameplay with basic mechanics.
+- Graphical interface using Raylib for rendering.
 
-This project is licensed under the MIT License - see the [`LICENSE`](./LICENSE) file for details.
+## Prerequisites
 
-**Controls**
-- **Arrow keys**: Control the snake's direction.
+Before running this project, ensure you have the following installed:
+
+- **C++ Compiler**: Ensure you have a C++ compiler that supports C++11 or later.
+- **Raylib Library**: Install Raylib library from [Raylib GitHub](https://github.com/raysan5/raylib) or using your package manager.
+
+## Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/snake-game.git
+   cd snake-game
