@@ -1,0 +1,19 @@
+{
+	"files.exclude": {
+		"**/.git": true,
+		"**/.svn": true,
+		"**/.hg": true,
+		"**/CVS": true,
+		"**/.DS_Store": true,
+		"**/*.o": true,
+		"**/*.exe": true,
+	},
+	"files.associations": {
+		"deque": "cpp",
+		"cstdlib": "cpp",
+		"optional": "cpp",
+		"iostream": "cpp",
+		"ostream": "cpp",
+		"ctime": "cpp"
+	}
+}
