@@ -28,6 +28,11 @@ enum GameState
 
 GameState gameState = MENU;
 
+void ResizeImageToFit(Image &image, int width, int height)
+{
+    ImageResize(&image, width, height); // Resize image in place
+}
+
 bool ElementInDeque(Vector2 element, deque<Vector2> deque)
 {
     for (unsigned int i = 0; i < deque.size(); i++)
@@ -69,7 +74,8 @@ public:
         {
             float x = body[i].x;
             float y = body[i].y;
-            DrawRectangle(x * cellSize, y * cellSize, cellSize, cellSize, gold);
+            Rectangle segment = Rectangle{x * cellSize, y * cellSize, (float)cellSize, (float)cellSize};
+            DrawRectangleRounded(segment, 0.5, 6, gold);
         }
     }
 
@@ -117,9 +123,9 @@ class Food
 {
 public:
     const float minY = 90.0f;
-
-public:
     Vector2 position;
+    Image fdimage;
+    Texture2D fdtexture;
 
     Vector2 GenerateRandomCell()
     {
@@ -128,33 +134,37 @@ public:
         return Vector2{x, y};
     }
 
-    Vector2 GenerateRandomPos(deque<Vector2> snakeBody)
+    Vector2 GenerateRandomPos(std::deque<Vector2> snakeBody)
     {
-        Vector2 position = GenerateRandomCell();
-        while (ElementInDeque(position, snakeBody))
+        Vector2 pos = GenerateRandomCell();
+        while (ElementInDeque(pos, snakeBody))
         {
-            position = GenerateRandomCell();
+            pos = GenerateRandomCell();
         }
-        return position;
+        return pos;
+    }
+
+    Food(std::deque<Vector2> snakeBody)
+        : position(GenerateRandomPos(snakeBody))
+    {
+        Image fdimage = LoadImage("assets/food.png");
+        ResizeImageToFit(fdimage, cellSize, cellSize); // Resize image to fit cell size
+        fdtexture = LoadTextureFromImage(fdimage);
+        UnloadImage(fdimage); // Unload image after creating texture
     }
 
     void Draw()
     {
-        DrawRectangle(position.x * cellSize, position.y * cellSize, cellSize, cellSize, gold);
-    }
-
-    Food(deque<Vector2> snakeBody)
-    {
-        // Image image = LoadImage("Graphics/food.png");
-        // texture = LoadTextureFromImage(image);
-        // UnloadImage(image);
-        position = GenerateRandomPos(snakeBody);
+        DrawTexture(fdtexture, position.x * cellSize, position.y * cellSize, WHITE);
     }
 
     ~Food()
     {
-        // UnloadTexture(texture);
+        // UnloadImage(fdimage); // Having Segmentation Fault
+        UnloadTexture(fdtexture);
     }
+
+public:
 };
 
 class GameStart
@@ -169,8 +179,15 @@ public:
     float setGameSpeed = 0.2;
     float scoreFac = 1;
     float factor = 0.01;
+    Texture2D bgTexture;
 
 public:
+    GameStart()
+    {
+
+        eatSound = LoadSound("sounds/eat.mp3");
+        wallSound = LoadSound("sounds/wall.mp3");
+    }
     void Draw()
     {
         food.Draw();
@@ -202,7 +219,7 @@ public:
             food.position = food.GenerateRandomPos(snake.body);
             snake.addSegment = true;
             score++;
-            // PlaySound(eatSound);
+            PlaySound(eatSound);
         }
     }
 
@@ -239,15 +256,39 @@ public:
         // food.position = food.GenerateRandomPos(snake.body);
         PlaySound(wallSound);
     }
+
+    ~GameStart()
+    {
+        // UnloadImage(bgImage);
+        UnloadTexture(bgTexture);
+        UnloadSound(wallSound);
+        UnloadSound(eatSound);
+    }
 };
 
 class Menu
 {
 public:
+    Image menuImage;
+    Texture2D menuTexture;
+
+    Menu()
+    {
+        menuImage = LoadImage("assets/backgroundmenu.png");
+        ResizeImageToFit(menuImage, cellSize * cellCount, cellSize * cellCount);
+        menuTexture = LoadTextureFromImage(menuImage);
+        UnloadImage(menuImage); // We can unload the image now that we have the texture
+    }
+
+    ~Menu()
+    {
+        UnloadTexture(menuTexture); // Unload the texture to free up VRAM
+    }
+
     void drawMenu()
     {
         BeginDrawing();
-        ClearBackground(darkGreen);
+        DrawTexture(menuTexture, 0, 0, WHITE);
         DrawText("Snake Game", 100, 100, 40, GOLD);
         DrawText("Press Enter to Start", 100, 200, 20, GOLD);
         EndDrawing();
@@ -272,13 +313,25 @@ int main()
 
     InitWindow(cellSize * cellCount, cellSize * cellCount, "Snake Game");
     SetTargetFPS(60);
+    Image icon = LoadImage("assets/logo.png");
+    SetWindowIcon(icon);
 
     GameStart game1 = GameStart();
     float thickness = 10.0f;
     Menu menu;
     GameOver gameover;
+
+    Image bgImage = LoadImage("assets/background3.png");
+    ResizeImageToFit(bgImage, cellSize * cellCount, cellSize * cellCount);
+    Texture2D bgTexture = LoadTextureFromImage(bgImage);
+    /*----------------------------------------------------------------------------------*/
+    int FPS;
+    /*----------------------------------------------------------------------------------*/
+
     while (!WindowShouldClose())
     {
+        // FPS = GetFPS();
+        // cout << FPS << endl;
         switch (gameState)
         {
         case MENU:
@@ -289,7 +342,9 @@ int main()
             }
             break;
         case GAMEPLAY:
+
             BeginDrawing();
+            DrawTexture(bgTexture, 0, 0, WHITE);
             game1.Draw();
             game1.gameUpdate();
             game1.gameSpeedControl();
@@ -311,6 +366,7 @@ int main()
             break;
         }
     }
+    UnloadImage(icon);
     CloseWindow();
     return 0;
 }
