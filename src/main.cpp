@@ -4,8 +4,6 @@
 #include <ctime>
 #include <deque>
 #include <iostream>
-// #include "gameover.cpp"
-// #include "Menu.cpp"
 
 using namespace std;
 
@@ -184,7 +182,7 @@ public:
 public:
     GameStart()
     {
-
+        InitAudioDevice();
         eatSound = LoadSound("sounds/eat.mp3");
         wallSound = LoadSound("sounds/wall.mp3");
     }
@@ -321,17 +319,14 @@ int main()
     Menu menu;
     GameOver gameover;
 
-    Image bgImage = LoadImage("assets/background3.png");
-    ResizeImageToFit(bgImage, cellSize * cellCount, cellSize * cellCount);
+    Image bgImage = LoadImage("assets/background.png");
     Texture2D bgTexture = LoadTextureFromImage(bgImage);
-    /*----------------------------------------------------------------------------------*/
-    int FPS;
+
     /*----------------------------------------------------------------------------------*/
 
     while (!WindowShouldClose())
     {
-        // FPS = GetFPS();
-        // cout << FPS << endl;
+
         switch (gameState)
         {
         case MENU:
